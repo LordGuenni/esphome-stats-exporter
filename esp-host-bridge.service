@@ -1,0 +1,27 @@
+[Unit]
+Description=ESP Host Bridge - Display metrics agent
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/esp-host-bridge --port /dev/ttyACM0 --enable-vms --virsh-uri qemu:///system
+Restart=always
+RestartSec=5
+User=root
+
+# Environment
+Environment=RUST_LOG=info
+
+# Security hardening
+NoNewPrivileges=false
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+
+# Access to devices
+DevicePolicy=closed
+DeviceAllow=/dev/ttyACM0 rw
+DeviceAllow=/dev/ttyUSB0 rw
+
+[Install]
+WantedBy=multi-user.target
