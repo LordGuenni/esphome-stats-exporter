@@ -50,12 +50,47 @@ struct Args {
     debug: bool,
 }
 
+// ESPHome USB device identifiers
+const ESPHOME_VID: u16 = 0x303a;
+const ESPHOME_PID: u16 = 0x4001;
+
 fn find_serial_port() -> Option<String> {
+    use serialport::SerialPortType;
+    
     let ports = serialport::available_ports().ok()?;
     
-    // Prefer /dev/ttyACM* devices (USB CDC)
+    // First priority: ESPHome device by VID:PID (303a:4001)
+    for port in &ports {
+        if let SerialPortType::UsbPort(usb_info) = &port.port_type {
+            if usb_info.vid == ESPHOME_VID && usb_info.pid == ESPHOME_PID {
+                info!(
+                    "Auto-detected ESPHome device: {} (VID:{:04x} PID:{:04x})",
+                    port.port_name, usb_info.vid, usb_info.pid
+                );
+                return Some(port.port_name.clone());
+            }
+        }
+    }
+    
+    // Second: any USB device with "ESPHome" in product name
+    for port in &ports {
+        if let SerialPortType::UsbPort(usb_info) = &port.port_type {
+            if let Some(ref product) = usb_info.product {
+                if product.to_lowercase().contains("esphome") {
+                    info!(
+                        "Auto-detected ESPHome device by name: {} ({})",
+                        port.port_name, product
+                    );
+                    return Some(port.port_name.clone());
+                }
+            }
+        }
+    }
+    
+    // Fallback: /dev/ttyACM* devices (USB CDC)
     for port in &ports {
         if port.port_name.contains("ttyACM") {
+            info!("Fallback to ttyACM device: {}", port.port_name);
             return Some(port.port_name.clone());
         }
     }
@@ -63,6 +98,7 @@ fn find_serial_port() -> Option<String> {
     // Then /dev/ttyUSB*
     for port in &ports {
         if port.port_name.contains("ttyUSB") {
+            info!("Fallback to ttyUSB device: {}", port.port_name);
             return Some(port.port_name.clone());
         }
     }

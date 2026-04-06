@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/opt/esp-host-bridge/esp-host-bridge --port /dev/ttyACM0 --enable-vms --virsh-uri qemu:///system
+ExecStart=/opt/esp-host-bridge/esp-host-bridge --enable-vms --virsh-uri qemu:///system
 Restart=always
 RestartSec=5
 User=root
@@ -18,10 +18,8 @@ ProtectSystem=strict
 ProtectHome=read-only
 PrivateTmp=true
 
-# Access to devices
-DevicePolicy=closed
-DeviceAllow=/dev/ttyACM0 rw
-DeviceAllow=/dev/ttyUSB0 rw
+# Access to devices (auto-detect ESPHome USB)
+DevicePolicy=auto
 
 [Install]
 WantedBy=multi-user.target
