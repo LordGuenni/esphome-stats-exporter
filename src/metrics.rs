@@ -244,7 +244,8 @@ impl HostMetrics {
             if dt > 0.0 {
                 let rx_diff = total_rx.saturating_sub(self.prev_net_rx) as f64;
                 let tx_diff = total_tx.saturating_sub(self.prev_net_tx) as f64;
-                ((rx_diff / dt / 1024.0) as f32, (tx_diff / dt / 1024.0) as f32)
+                // Convert bytes/s to kbps (kilobits per second): * 8 / 1000
+                ((rx_diff / dt * 8.0 / 1000.0) as f32, (tx_diff / dt * 8.0 / 1000.0) as f32)
             } else {
                 (0.0, 0.0)
             }
