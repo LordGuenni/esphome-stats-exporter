@@ -104,7 +104,3 @@ DOCKRUN=5,DOCKSTOP=2,DOCKUNH=0,DOCKER=nginx|running;redis|running,POWER=RUNNING
 ```
 VMSRUN=2,VMSSTOP=1,VMSPAUSE=0,VMSOTHER=0,VMS=ubuntu|running|4|8192|Running;win10|stopped|2|4096|Stopped,POWER=RUNNING
 ```
-
-## License
-
-MIT
